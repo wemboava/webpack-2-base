@@ -19,6 +19,11 @@ module.exports = {
                     use: ['css-loader', 'sass-loader'],
                     publicPath: '/dist'
                 }) 
+            },
+            {
+                test: /\.js$/,
+                exclude: '/node_modules/',
+                use: 'babel-loader'
             }
         ]
     },
@@ -26,8 +31,8 @@ module.exports = {
     devServer: {
         contentBase: path.join(__dirname, "dist"),
         compress: true,
-        stats: "errors-only",
-        open: true
+        port: 9000,
+        stats: "errors-only"
     },
     
     plugins: [
