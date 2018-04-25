@@ -1,30 +1,24 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin')
     , ExtractTextPlugin = require("extract-text-webpack-plugin")
-    , path = require('path');
+    , webpack = require('webpack')
+    , path = require('path')
+    , loaders = require('./webpack/config/loaders')
+
 
 module.exports = {
-    entry: './src/app.js',
+    entry: {
+        app: './src/app.js',
+        contact: './src/contact.js'
+    },
     
     output: {
         path: path.resolve(__dirname, "dist"),
-        filename: 'app.bundle.js'
+        filename: '[name].bundle.js'
     },
     
     module: {
         rules: [
-            { 
-                test: /\.scss$/, 
-                use: ExtractTextPlugin.extract({
-                    fallback: 'style-loader',
-                    use: ['css-loader', 'sass-loader'],
-                    publicPath: '/dist'
-                }) 
-            },
-            {
-                test: /\.js$/,
-                exclude: '/node_modules/',
-                use: 'babel-loader'
-            }
+            ...loaders
         ]
     },
     
@@ -32,6 +26,7 @@ module.exports = {
         contentBase: path.join(__dirname, "dist"),
         compress: true,
         port: 9000,
+        hot: true,
         stats: "errors-only"
     },
     
@@ -41,14 +36,27 @@ module.exports = {
             minify: {
                 collapseWhitespace: true
             },
+            excludeChunks: ['contact'],
             // Load a custom template (lodash by default see the FAQ for details)
             template: './src/index.html'
         }),
-        
+        new HtmlWebpackPlugin({
+            title: 'Contact Page',
+            // minify: {
+            //     collapseWhitespace: true
+            // },
+            chunks: ['contact'],
+            filename: 'contact.html',
+            template: './src/contact.html'
+        }),
         new ExtractTextPlugin({
             filename: 'app.css',
-            disable: false,
+            disable: true,
             allChunks: true
-        })
+        }),
+        // enable HMR globally
+        new webpack.HotModuleReplacementPlugin(),
+        // prints more readable module names in the browser console on HMR update
+        new webpack.NamedModulesPlugin()
     ]
 }
